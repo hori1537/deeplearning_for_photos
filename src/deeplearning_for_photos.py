@@ -6,7 +6,6 @@
 
 # coding: UTF-8
 import os
-
 import random
 from pathlib import Path
 
@@ -60,15 +59,15 @@ def main():
                         title = 'choose data folder')
 
     theme_dir        = Path(data_folder_path)
+    #theme_dir        = os.path.basename(theme_dir)
     #theme_dir        =r'C:\Users\3ken\Desktop\data_science\pictures\actors'
 
-    theme_name      = os.path.basename(os.path.dirname(theme_dir))
+    theme_name      =  os.path.basename(theme_dir)
 
     train_dir       = theme_dir / 'train'
     validation_dir  = theme_dir / 'validation'
     test_dir        = theme_dir / 'test'
     display_dir     = theme_dir / 'display'
-
 
     paths = [parent_path / 'models' / theme_name,
              parent_path / 'models' / theme_name / 'best_model',
@@ -83,7 +82,7 @@ def main():
     print(label)
     print(n_categories)
 
-    n_epochs = 5
+    n_epochs = 1
     net_type = 'xception'
     #net_type = 'mobilenet'
     batch_size=32
@@ -315,7 +314,17 @@ def main():
     print('\n test_acc:',score[1])
 
     #save weights
-    model.save(theme_dir /'model' / (file_name + '_' + str(round(score[1],2)) + '.h5'))
+    #model.save('Test.h5')
+    #print(str(theme_dir /'model' / (file_name + '_' + str(round(score[1],2)) + '.h5')))
+    os.chdir(theme_dir)
+    try:
+        model.save(str('model' / (file_name + '_' + str(round(score[1],2)) + '.h5')))
+    except OSError:
+        print('OSError')
+        print('model.saveに失敗しました。')
+        print('Kドライブ上ではディープラーニングのモデルの保存ができないことがあります')
+        print('モデルが必要な場合はCドライブ上で実行してください。')
+
 
     #predict model and display images
     files=os.listdir(display_dir)
