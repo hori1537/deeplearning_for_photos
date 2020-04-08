@@ -318,12 +318,12 @@ def main():
     #print(str(theme_dir /'model' / (file_name + '_' + str(round(score[1],2)) + '.h5')))
     os.chdir(theme_dir)
     try:
-        model.save(str('model' / (file_name + '_' + str(round(score[1],2)) + '.h5')))
+        model.save(str('model' + (file_name + '_' + str(round(score[1],2)) + '.h5')))
     except OSError:
         print('OSError')
         print('model.saveに失敗しました。')
-        print('Kドライブ上ではディープラーニングのモデルの保存ができないことがあります')
-        print('モデルが必要な場合はCドライブ上で実行してください。')
+    else:
+        print('model saveに失敗しました')
 
 
     #predict model and display images
@@ -349,7 +349,7 @@ def main():
         #eliminate xticks,yticks
         plt.xticks([]),plt.yticks([])
 
-
+    print('finished!')
     plt.show()
 
 main()
