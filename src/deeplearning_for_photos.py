@@ -11,6 +11,7 @@ from pathlib import Path
 
 import tkinter
 import tkinter.filedialog
+from tkinter import ttk,N,E,S,W,font
 
 # third party libraries
 import matplotlib.pyplot as plt
@@ -50,13 +51,7 @@ def chk_mkdir(paths):
     return
 
 def main():
-    print('学習させたいデータベースのフォルダーを選んでください')
-    print('そのフォルダー内に　train, test, validation, display　フォルダが必要です。')
-
-    tk = tkinter.Tk()
-    tk.withdraw()     #tkinterを表示させない
-    data_folder_path = tkinter.filedialog.askdirectory(initialdir = data_processed_path,
-                        title = 'choose data folder')
+    data_folder_path = t_folderpath.get()
 
     theme_dir        = Path(data_folder_path)
     #theme_dir        = os.path.basename(theme_dir)
@@ -82,8 +77,11 @@ def main():
     print(label)
     print(n_categories)
 
-    n_epochs = 1
-    net_type = 'xception'
+    high_low = str(var_epoch.get())
+    epoch_list = {'high':300, 'middle':50, 'low':1}
+    n_epochs = epoch_list[high_low]
+
+    net_type = var_model.get()
     #net_type = 'mobilenet'
     batch_size=32
     input_image_size = 224
@@ -316,14 +314,15 @@ def main():
     #save weights
     #model.save('Test.h5')
     #print(str(theme_dir /'model' / (file_name + '_' + str(round(score[1],2)) + '.h5')))
-    os.chdir(theme_dir)
-    try:
-        model.save(str('model' + (file_name + '_' + str(round(score[1],2)) + '.h5')))
-    except OSError:
-        print('OSError')
-        print('model.saveに失敗しました。')
-    else:
-        print('model saveに失敗しました')
+    if Booleanvar_savemodel == True:
+        os.chdir(theme_dir)
+        try:
+            model.save(str('model' + (file_name + '_' + str(round(score[1],2)) + '.h5')))
+        except OSError:
+            print('OSError')
+            print('model.saveに失敗しました。')
+        else:
+            print('model saveに失敗しました')
 
 
     #predict model and display images
@@ -352,4 +351,101 @@ def main():
     print('finished!')
     plt.show()
 
-main()
+
+
+
+def choose_folder():
+    print('学習させたいデータベースのフォルダーを選んでください')
+    print('そのフォルダー内に　train, test, validation, display　フォルダが必要です。')
+
+    data_folder_path = tkinter.filedialog.askdirectory(initialdir = data_processed_path,
+                        title = 'choose data folder')
+
+    t_foldername.set(str(Path(data_folder_path).name))
+    t_folderpath.set(data_folder_path)
+
+    t_theme_name.set(Path(data_folder_path).name)
+
+    return
+
+
+# tkinter
+root = tkinter.Tk()
+#root.withdraw()
+
+font1 = font.Font(family='游ゴシック', size=10, weight='bold')
+root.option_add("*Font", font1)
+style1  = ttk.Style()
+style1.configure('my.TButton', font = ('游ゴシック',10)  )
+root.title('Deep learning for photos')
+
+frame1  = tkinter.ttk.Frame(root, height = 500, width = 500)
+frame1.grid(row=0,column=0,sticky=(N,E,S,W))
+
+label_folder  = tkinter.ttk.Label(frame1, text = 'フォルダパス:', anchor="w")
+
+t_foldername = tkinter.StringVar()
+t_folderpath = tkinter.StringVar()
+
+entry_foldername  = ttk.Entry(frame1, textvariable = t_foldername, width = 20)
+
+button_choose_folder    = ttk.Button(frame1, text='フォルダ選択',
+                                 command = choose_folder, style = 'my.TButton')
+
+
+#label_theme_name  = tkinter.ttk.Label(frame1, text = 'テーマ名を入力:')
+t_theme_name = tkinter.StringVar()
+#entry_theme_name  = ttk.Entry(frame1, textvariable = t_theme_name, width = 20)
+
+#save_folder_name = os.path.dirname(t_foldername.get()) + 'result'
+
+
+var_epoch = tkinter.StringVar()
+var_epoch.set('low')
+
+Radiobutton_epoch_high = tkinter.Radiobutton(frame1, value = 'high',   text = 'とことん', variable = var_epoch)
+Radiobutton_epoch_middle = tkinter.Radiobutton(frame1, value = 'middle', text = '普通', variable = var_epoch)
+Radiobutton_epoch_low = tkinter.Radiobutton(frame1, value = 'low',    text = '軽く', variable = var_epoch)
+
+label_epoch =tkinter.ttk.Label(frame1, text = 'エポック数:', anchor="w")
+
+var_model = tkinter.StringVar()
+var_model.set('mobilenet')
+
+Radiobutton_epoch_xception = tkinter.Radiobutton(frame1, value = 'xception',   text = 'xception', variable = var_model)
+Radiobutton_epoch_mobilenet = tkinter.Radiobutton(frame1, value = 'mobilenet', text = 'mobilenet', variable = var_model)
+Radiobutton_epoch_vgg16 = tkinter.Radiobutton(frame1, value = 'vgg16',    text = 'vgg16', variable = var_model)
+Radiobutton_epoch_original = tkinter.Radiobutton(frame1, value = 'original',    text = 'original', variable = var_model)
+
+label_model =tkinter.ttk.Label(frame1, text = 'モデル:', anchor="w")
+
+Booleanvar_savemodel = tkinter.BooleanVar()
+Booleanvar_savemodel.set(False)
+Checkbutton_savemodel = tkinter.Checkbutton(frame1, text = 'モデル保存', variable = Booleanvar_savemodel)
+button_learning     = ttk.Button(frame1, text='訓練開始',
+                                 command = main, style = 'my.TButton')
+
+button_choose_folder.grid(row=1,column=2,sticky=W)
+label_folder.grid(row=2,column=1,sticky=E)
+entry_foldername.grid(row=2,column=2,sticky=W)
+
+label_epoch.grid(row =3, column =1,sticky=E)
+Radiobutton_epoch_high.grid(row =3, column =2,sticky=W)
+Radiobutton_epoch_middle.grid(row =3, column =3,sticky=W)
+Radiobutton_epoch_low.grid(row =3, column =4,sticky=W)
+
+label_model.grid(row =4, column =1,sticky=E)
+Radiobutton_epoch_xception.grid(row=4,column=2,sticky=W)
+Radiobutton_epoch_mobilenet.grid(row=4,column=3,sticky=W)
+Radiobutton_epoch_vgg16.grid(row=4,column=4,sticky=W)
+Radiobutton_epoch_original.grid(row=4,column=5,sticky=W)
+
+#label_theme_name.grid(row=4,column=1,sticky=E)
+#entry_theme_name.grid(row=4,column=2,sticky=W)
+
+Checkbutton_savemodel.grid(row = 7, column =2, sticky = W)
+button_learning.grid(row = 10 , column = 2, sticky = W)
+
+for child in frame1.winfo_children():
+    child.grid_configure(padx=5, pady=5)
+root.mainloop()
