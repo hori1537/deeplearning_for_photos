@@ -78,7 +78,7 @@ def main():
     print(n_categories)
 
     high_low = str(var_epoch.get())
-    epoch_list = {'high':300, 'middle':50, 'low':1}
+    epoch_list = {'high':300, 'middle':50, 'low':10}
     n_epochs = epoch_list[high_low]
 
     net_type = var_model.get()
@@ -314,15 +314,17 @@ def main():
     #save weights
     #model.save('Test.h5')
     #print(str(theme_dir /'model' / (file_name + '_' + str(round(score[1],2)) + '.h5')))
-    if Booleanvar_savemodel == True:
-        os.chdir(theme_dir)
-        try:
-            model.save(str('model' + (file_name + '_' + str(round(score[1],2)) + '.h5')))
-        except OSError:
-            print('OSError')
-            print('model.saveに失敗しました。')
-        else:
-            print('model saveに失敗しました')
+    if Booleanvar_savemodel.get() == True:
+        print('モデル保存')
+        os.chdir(parent_path / 'models' / theme_name)
+        #try:
+        print('モデル保存')
+        model.save(str( (file_name + '_' + str(round(score[1],2)) + '.h5')))
+        #except OSError:
+        #print('OSError')
+        #print('model.saveに失敗しました。')
+        #else:
+        #    print('model saveに失敗しました')
 
 
     #predict model and display images
